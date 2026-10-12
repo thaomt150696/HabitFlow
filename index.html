@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#3F5FC4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HabitFlow">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>HabitFlow – bản dùng thử</title>
+<style>
+/* Font tùy chọn: nếu đặt file fonts/BeVietnamPro-*.woff2 cạnh index.html thì app tự dùng; không có thì dùng font hệ thống. */
+@font-face{font-family:"Be Vietnam Pro";font-weight:400;font-display:swap;src:local("Be Vietnam Pro"),url("fonts/BeVietnamPro-Regular.woff2") format("woff2")}
+@font-face{font-family:"Be Vietnam Pro";font-weight:600;font-display:swap;src:local("Be Vietnam Pro SemiBold"),url("fonts/BeVietnamPro-SemiBold.woff2") format("woff2")}
+:root{--bg:#FBF7F1;--surface:#FFFFFF;--s2:#F3ECE1;--border:#D9CFC0;--strong:#8F8472;--text:#2B2620;--text2:#6A6155;--primary:#3F5FC4;--on-primary:#FFFFFF;--primary-soft:#DDE5FA;--amber:#8A5A00;--shadow:0 2px 10px rgba(60,40,20,.14);--font:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color-scheme:light}
+[data-theme="dark"]{--bg:#1E1A16;--surface:#28231E;--s2:#332D26;--border:#4A4137;--strong:#9C917F;--text:#F3ECE1;--text2:#B9AE9C;--primary:#8FA8F0;--on-primary:#1E1A16;--primary-soft:#27355E;--amber:#E3B04B;--shadow:0 2px 12px rgba(0,0,0,.5);color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:400 16px/24px var(--font);-webkit-text-size-adjust:100%}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:560px;margin:0 auto;background:var(--bg);padding-top:env(safe-area-inset-top)}
+.scr{flex:1;overflow-y:auto;padding:0 16px 24px;-webkit-overflow-scrolling:touch;position:relative}
+.tabbar{display:flex;border-top:1px solid var(--border);background:var(--surface);flex:none;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar div{flex:1;text-align:center;padding:8px 4px 6px;font:500 12px/16px var(--font);color:var(--text2);min-height:56px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.tabbar .on{color:var(--primary);font-weight:700}
+svg.ic{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+[data-a]{cursor:pointer}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:48px}
+.t1{font:700 26px/34px var(--font)}.t2{font:600 20px/28px var(--font)}
+.sub{color:var(--text2);font:400 14px/20px var(--font)}
+.icb{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;border:0;background:transparent;color:var(--text);flex:none}
+.icb.o{border:1.5px solid var(--strong)}
+.btn{min-height:48px;padding:0 22px;border-radius:14px;border:2px solid transparent;font:600 16px/24px var(--font);display:flex;align-items:center;justify-content:center;width:100%;text-align:center}
+.btn.p{background:var(--primary);color:var(--on-primary)}
+.btn.s{background:transparent;border-color:var(--strong);color:var(--text)}
+.btn.t{background:transparent;color:var(--primary);text-decoration:underline;text-underline-offset:3px;min-height:44px}
+.btn.dis{opacity:.45;pointer-events:none}.btn.fit{width:auto}
+.chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1.5px solid var(--strong);border-radius:999px;font:500 14px var(--font);background:var(--surface);color:var(--text);white-space:nowrap}
+.chip.on{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.chip.w{min-width:44px;justify-content:center;padding:0 10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin:10px 0}
+.banner{background:var(--primary-soft);border:1.5px solid var(--primary);border-radius:14px;padding:12px 44px 12px 14px;margin:10px 0;position:relative}
+.banner b{display:block}.banner .x{position:absolute;right:2px;top:2px}
+.hab{display:flex;gap:12px;align-items:center;padding:10px 12px;min-height:68px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:8px 0}
+.hab .mid{flex:1;min-width:0}
+.hab b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font:600 16px/22px var(--font)}
+.hab small{display:flex;gap:6px;align-items:center;color:var(--text2);font:400 13px/18px var(--font)}
+.hab small span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.hab .pg{font:500 13px var(--font);color:var(--text2);white-space:nowrap}
+.hab.done{background:var(--s2)}.hab.done b{color:var(--text2)}.hab.paused{opacity:.7}
+.ck{width:24px;height:24px;border:2px solid var(--strong);border-radius:7px;display:inline-block;position:relative;flex:none;background:var(--surface)}
+.ck.s{width:20px;height:20px;border-radius:6px;border-width:1.5px}
+.ck.on{background:var(--primary);border-color:var(--primary)}
+.ck.on:after{content:"";position:absolute;left:7px;top:2px;width:6px;height:12px;border:solid var(--on-primary);border-width:0 2.5px 2.5px 0;transform:rotate(40deg)}
+.ck.s.on:after{left:5px;top:1px;width:5px;height:10px}
+.ckw{width:44px;height:44px;display:grid;place-items:center;margin:-12px -10px -12px -12px;flex:none}
+.ring{--p:0;width:40px;height:40px;border-radius:50%;background:conic-gradient(var(--primary) calc(var(--p)*1%),var(--s2) 0);display:grid;place-items:center;position:relative;flex:none}
+.ring:before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--surface)}
+.ring span{position:relative;font:600 11px/14px var(--font)}
+.ring.full{background:var(--primary)}.ring.full:before{display:none}.ring.full span{color:var(--on-primary)}
+.rw{width:48px;height:48px;display:grid;place-items:center;margin:-4px -4px -4px -6px;flex:none}
+.fab{position:absolute;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;box-shadow:var(--shadow);z-index:3}
+.dim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50}
+.sheet{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:560px;bottom:0;background:var(--surface);border-radius:24px 24px 0 0;padding:10px 16px calc(24px + env(safe-area-inset-bottom));z-index:51;box-shadow:var(--shadow);max-height:88%;overflow:auto}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--strong);margin:0 auto 12px}
+.snack{position:fixed;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:528px;bottom:calc(76px + env(safe-area-inset-bottom));background:var(--text);color:var(--bg);border-radius:14px;padding:6px 16px;display:flex;justify-content:space-between;align-items:center;font:500 14px/20px var(--font);z-index:60;min-height:48px}
+.snack b{text-decoration:underline;min-height:44px;display:flex;align-items:center}
+.dlg{position:fixed;left:50%;transform:translateX(-50%);width:calc(100% - 48px);max-width:400px;top:28%;background:var(--surface);border-radius:20px;padding:18px;z-index:61;box-shadow:var(--shadow)}
+.illus{border-radius:20px;background:repeating-linear-gradient(135deg,var(--primary-soft) 0 10px,var(--s2) 10px 20px);display:grid;place-items:center;color:var(--text2);font:500 12px var(--font);text-align:center;padding:8px}
+.field{border:1.5px solid var(--strong);border-radius:14px;padding:0 14px;min-height:52px;background:var(--surface);margin:8px 0;width:100%;font:400 16px var(--font);color:var(--text)}
+.field:focus{outline:none;border:2.5px solid var(--primary)}
+textarea.field{padding:10px 14px;min-height:140px;font-size:12px;line-height:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;border-bottom:1px solid var(--border)}
+.row:last-child{border:0}
+.sw{width:50px;height:30px;border-radius:15px;background:var(--primary);position:relative;flex:none}
+.sw:after{content:"";position:absolute;right:3px;top:3px;width:24px;height:24px;border-radius:50%;background:var(--on-primary)}
+.sw.off{background:var(--s2);border:2px solid var(--strong)}.sw.off:after{left:3px;right:auto;background:var(--strong);top:1px}
+.st{--sz:24px;width:var(--sz);height:var(--sz);border-radius:50%;display:inline-block;position:relative;vertical-align:middle;flex:none}
+.st.done{background:var(--primary);border:2px solid var(--primary)}
+.st.done:after{content:"";position:absolute;left:34%;top:14%;width:27%;height:50%;border:solid var(--on-primary);border-width:0 2.5px 2.5px 0;transform:rotate(40deg)}
+.st.part{border:2px solid var(--primary);background:linear-gradient(90deg,var(--primary) 50%,var(--surface) 50%)}
+.st.miss{border:2px solid var(--strong);background:var(--s2)}
+.st.rest{border:2.5px dashed var(--strong);background:var(--surface)}
+.st.rest:after{content:"";position:absolute;left:18%;right:18%;top:calc(50% - 1.5px);height:3px;border-radius:2px;background:var(--strong)}
+.st.future{border:2px dashed var(--strong);background:transparent}
+.st.today{border:3.5px solid var(--primary);background:var(--surface)}
+.st.na{width:calc(var(--sz)*.3);height:calc(var(--sz)*.3);background:var(--strong);margin:calc(var(--sz)*.35)}
+.st.sm.done:after{display:none}.st.sm{--sz:14px}
+.st.sm.done,.st.sm.part,.st.sm.miss,.st.sm.today,.st.sm.rest,.st.sm.future{border-width:2px}
+.st.sm.rest:after{left:16%;right:16%;top:calc(50% - 1px);height:2px}.st.sm.today{border-width:3px}
+.cell{display:inline-block;height:18px;border-radius:2px;border:2px solid var(--strong);box-sizing:border-box;flex:1;min-width:0}
+.cell.done{background:var(--primary);border-color:var(--primary)}
+.cell.part{border-color:var(--primary);background:linear-gradient(180deg,var(--primary) 50%,var(--surface) 50%)}
+.cell.miss{background:var(--s2)}
+.cell.rest{border-style:dashed;background:linear-gradient(var(--surface) 35%,var(--strong) 35% 65%,var(--surface) 65%)}
+.cell.future{border-style:dashed;background:transparent}
+.cell.na{border:0;height:4px;background:var(--strong);border-radius:2px;align-self:center}
+.strip{display:flex;gap:1px;margin-top:6px;align-items:center}
+.legend{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;font:400 13px/18px var(--font);color:var(--text2);margin:8px 0}
+.legend span{display:inline-flex;gap:5px;align-items:center}
+.wgrid{display:grid;grid-template-columns:repeat(7,1fr);justify-items:center;align-items:center;margin-top:6px}
+.wd{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font:500 11px/14px var(--font);color:var(--text2)}
+.bars{display:flex;gap:6px;align-items:flex-end;height:70px;margin-top:6px}
+.bars div{flex:1;background:var(--primary);border-radius:4px 4px 0 0;min-height:3px}
+.bars div.low{background:var(--surface);border:2px dashed var(--primary);border-bottom:0}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);margin-top:2px}
+.kc{aspect-ratio:1;display:grid;place-items:center}.kc.run{background:var(--s2)}.kc .st{--sz:70%}
+.mh{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin:8px 0}
+.mhd{display:flex;justify-content:space-between;align-items:center;gap:8px}.mhd b{font:600 15px/22px var(--font)}
+.lnk{font:600 13px var(--font);border:1.5px solid var(--primary);color:var(--primary);border-radius:999px;padding:0 12px;min-height:44px;display:inline-flex;align-items:center;margin:-8px -4px -8px 0;white-space:nowrap}
+.foot{font:400 12px/16px var(--font);color:var(--text2);margin-top:4px}
+.menu{position:fixed;right:max(16px,calc(50% - 264px));top:calc(76px + env(safe-area-inset-top));width:250px;background:var(--surface);border:1px solid var(--border);border-radius:16px;z-index:52;box-shadow:var(--shadow);overflow:hidden}
+.menu div{padding:10px 16px;min-height:56px;border-bottom:1px solid var(--border)}.menu div:last-child{border:0}
+.sk{background:var(--s2);border-radius:8px}
+@media (prefers-reduced-motion:no-preference){.btn,.chip,.hab{transition:transform .08s}.btn:active,.chip:active,.hab:active{transform:scale(.98)}}
+.big{font:700 22px/30px var(--font)}
+</style>
+</head>
+<body data-theme="light">
+<div id="app"></div>
+<script>
+'use strict';
+/* =========================================================
+   HabitFlow – bản dùng thử (PWA). Dữ liệu chỉ lưu trên máy này.
+   ========================================================= */
+const VERSION='bản dùng thử 1';
+const KEY='hf_v1';
+const Q=new URLSearchParams(location.search);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+let STORE_OK=true;
+
+/* ---------- ngày giờ (giờ địa phương) ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const fmt=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return fmt(d)};
+const dow=s=>(parse(s).getDay()+6)%7;                       // Thứ Hai = 0
+const DN=['Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy','Chủ Nhật'];
+const DS=['T2','T3','T4','T5','T6','T7','CN'];
+const dm=s=>{const d=parse(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}`};
+const mondayOf=s=>addDays(s,-dow(s));
+let TODAY=Q.get('today')||fmt(new Date());
+const daysIn=(y,m)=>new Date(y,m+1,0).getDate();
+
+/* ---------- dữ liệu ---------- */
+const blank=()=>({v:1,habits:[],recs:{},opens:[],set:{mode:'sys',pid:''},pausedAll:null,flags:{},next:1,created:TODAY});
+let D=null;
+function load(){try{const j=localStorage.getItem(KEY);if(j)return JSON.parse(j)}catch(e){STORE_OK=false}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){STORE_OK=false}}
+const H=id=>D.habits.find(h=>h.id==id);
+const active=()=>D.habits.filter(h=>h.st==='active');
+const rec=(h,date,mk)=>{let r=D.recs[date];if(!r){if(!mk)return null;r=D.recs[date]={}}let x=r[h.id];if(!x&&mk)x=r[h.id]={ids:[],d:0,t:h.subs.length,rest:0,done:0};return x||null};
+
+/* ---------- trạng thái từng ngày ---------- */
+const pausedOn=(h,date)=>(h.pause&&date>=h.pause.from&&date<=h.pause.to)||(D.pausedAll&&date>=D.pausedAll.from&&date<=D.pausedAll.to);
+const sched=(h,date)=>date>=h.created&&(h.rep.t==='daily'||(h.rep.t==='days'&&h.rep.days.includes(dow(date))));
+function dstat(h,date){
+  if(date<h.created)return 'n';
+  const r=rec(h,date);
+  if(r&&r.rest||pausedOn(h,date)&&date<=TODAY)return 'r';
+  const tick=r&&(r.t>0?r.d>0:r.done);
+  if(tick){const full=r.t>0?r.d>=r.t:true;return full?'d':'p'}
+  if(date>TODAY)return (h.rep.t==='n'||!sched(h,date))?'n':'f';
+  if(h.rep.t==='n')return date===TODAY?'t':'n';
+  if(!sched(h,date))return 'n';
+  return date===TODAY?'t':'m';
+}
+const isG=c=>c==='d'||c==='p';
+const counts=(h,date)=>h.rep.t!=='n'&&sched(h,date);       // ngày có lịch tính vào x/y và chuỗi
+
+function streak(h){
+  if(h.rep.t==='n'){
+    let run=0,best=0,w=mondayOf(h.created);const cur=mondayOf(TODAY);
+    for(;w<=cur;w=addDays(w,7)){let c=0;for(let i=0;i<7;i++){const d=addDays(w,i);if(d<=TODAY&&isG(dstat(h,d)))c++}
+      if(c>=h.rep.n){run++;best=Math.max(best,run)}else if(w<cur)run=0}
+    return {cur:run,best,unit:'tuần'};
+  }
+  let run=0,best=0;
+  for(let d=h.created;d<=TODAY;d=addDays(d,1)){
+    if(!counts(h,d))continue;const c=dstat(h,d);
+    if(c==='r'||c==='t'||c==='f')continue;
+    if(isG(c)){run++;best=Math.max(best,run)}else run=0;
+  }
+  return {cur:run,best,unit:'ngày'};
+}
+const streakTxt=h=>{const s=streak(h);return s.cur>0?`Chuỗi ${s.cur} ${s.unit}`:(s.best>0?`Chuỗi tốt nhất: ${s.best} ${s.unit}`:'Chưa có chuỗi')};
+function xy(h,from,to){      // giữ nhịp / số ngày có lịch (không tính nghỉ, không tính hôm nay chưa tick)
+  if(h.rep.t==='n'){let c=0;for(let d=from;d<=to;d=addDays(d,1))if(d<=TODAY&&isG(dstat(h,d)))c++;return {x:Math.min(c,h.rep.n),y:h.rep.n,w:true}}
+  let x=0,y=0;
+  for(let d=from;d<=to;d=addDays(d,1)){if(d>TODAY||!counts(h,d))continue;const c=dstat(h,d);if(c==='r'||c==='t'||c==='n')continue;y++;if(isG(c))x++}
+  return {x,y};
+}
+const xyTxt=r=>r.w?`${r.x}/${r.y} ngày${r.x>=r.y?' ✓':''}`:(r.y?`${r.x}/${r.y} ngày`:'');
+
+/* ---------- thao tác ghi ---------- */
+let snackT;
+function snack(text,undo){S.snack={text,undo:undo||null};clearTimeout(snackT);snackT=setTimeout(()=>{S.snack=null;render()},10000)}
+function withUndo(fn,msg){const b=JSON.stringify(D);fn();S.undo=b;snack(msg,true);}
+function sync(h,date,r){r.t=h.subs.length;r.d=r.ids.filter(i=>h.subs.some(s=>s.id===i)).length}
+function tickSub(hid,sid,date){const h=H(hid);date=date||TODAY;const r=rec(h,date,true);const i=r.ids.indexOf(sid);if(i>=0)r.ids.splice(i,1);else{r.ids.push(sid);r.rest=0}sync(h,date,r);buzz();}
+function tickHab(hid,date){const h=H(hid);date=date||TODAY;const r=rec(h,date,true);r.t=0;r.done=r.done?0:1;if(r.done)r.rest=0;buzz();}
+const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}};
+
+/* ---------- trạng thái giao diện ---------- */
+let S={screen:'today',stack:[],sheet:null,dlg:null,snack:null,undo:null,menu:false,edit:false,cur:null,editId:null,tab:'h',form:{},wk:0,mo:0,calH:null,laterOpen:false,onb:0,ret:null,pd:3,tmp:{}};
+
+/* ---------- thành phần giao diện ---------- */
+const P={plus:'<path d="M12 5v14M5 12h14"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',next:'<path d="M9 5l7 7-7 7"/>',back:'<path d="M15 5l-7 7 7 7"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',more:'<circle cx="5" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.8" fill="currentColor" stroke="none"/>',edit:'<path d="M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3"/>',moon:'<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/>',month:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 14h.01M12 14h.01M15 14h.01M9 17h.01M12 17h.01"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',flame:'<path d="M12 3c1 3 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>',minus:'<path d="M6 12h12"/>'};
+const ic=(n,s)=>`<svg class="ic" viewBox="0 0 24 24" ${s?`style="width:${s}px;height:${s}px"`:''} aria-hidden="true">${P[n]}</svg>`;
+const CLS={d:'done',p:'part',m:'miss',r:'rest',t:'today',n:'na',f:'future'};
+const st=(c,sz)=>`<span class="st ${CLS[c]||c}${sz&&sz<=14?' sm':''}" ${sz&&sz>14?`style="--sz:${sz}px"`:''}></span>`;
+const tabs=a=>`<div class="tabbar"><div data-a="tab:h" class="${a==='h'?'on':''}">${ic('check')}Hôm nay</div><div data-a="tab:w" class="${a==='w'?'on':''}">${ic('cal')}Tuần</div><div data-a="tab:m" class="${a==='m'?'on':''}">${ic('month')}Tháng</div></div>`;
+const bar=t=>`<div class="top"><div class="t1">${t}</div><span class="icb" data-a="go:settings" aria-label="Cài đặt">${ic('gear')}</span></div>`;
+const per=(l,prev,next,dis)=>`<div class="top" style="min-height:44px"><span class="icb" data-a="${prev}" aria-label="Kỳ trước">${ic('back')}</span><div class="t2" style="flex:1;text-align:center;font-size:17px">${l}</div><span class="icb" ${dis?'style="opacity:.35;pointer-events:none"':`data-a="${next}"`} aria-label="Kỳ sau">${ic('next')}</span></div>`;
+const nav=(title,right,back)=>`<div class="top"><span class="icb" data-a="${back||'back'}" aria-label="Quay lại">${ic('back')}</span><div class="t2" style="flex:1">${title}</div>${right||''}</div>`;
+const ring=(d,t)=>t===0?`<span class="ring"><span></span></span>`:(d>=t?`<span class="ring full"><span>${t}/${t}</span></span>`:`<span class="ring" style="--p:${Math.round(d/t*100)}"><span>${d}/${t}</span></span>`);
+const legend=x=>`<div class="legend"><span>${st('d',14)} làm hết</span><span>${st('p',14)} một vài việc</span><span>${st('m',14)} chưa làm</span><span>${st('r',14)} nghỉ</span>${x||''}</div>`;
+const dotsRow=(arr,attr)=>`<div class="wgrid">${arr.map((c,i)=>`<span ${attr?attr(i):''} style="width:100%;min-height:44px;display:grid;place-items:center">${st(c,24)}</span>`).join('')}</div>`;
+const DOWROW=`<div class="wd" style="margin-top:8px">${DS.map(x=>`<span>${x}</span>`).join('')}</div>`;
+const stripHtml=cs=>`<div class="strip">${cs.map(c=>`<span class="cell ${CLS[c]||'future'}"></span>`).join('')}</div>`;
+
+/* ---------- Hôm nay ---------- */
+function habCard(h){
+  const t=h.subs.length,r=rec(h,TODAY),d=r?(t?r.d:(r.done?1:0)):0,done=t>0?d>=t:!!(r&&r.done);
+  const rest=(r&&r.rest)||pausedOn(h,TODAY);
+  const pg=xyTxt(xy(h,addDays(TODAY,-6),TODAY));
+  if(rest)return `<div class="hab paused" data-a="open:${h.id}"><span class="icb o" style="width:40px;height:40px;pointer-events:none">${ic('moon')}</span><div class="mid"><b>${esc(h.name)}</b><small>${D.pausedAll&&pausedOn(h,TODAY)||h.pause?'Đang nghỉ':'Nghỉ hôm nay'}</small></div><span class="pg">${pg}</span></div>`;
+  let sub,ringEl;
+  if(done)sub='Xong hôm nay';
+  else if(t===0)sub='Chạm vòng để tick';
+  else{const nx=h.subs.find(s=>!(r&&r.ids.includes(s.id)));sub=`<span class="ckw" data-a="ticks:${h.id}:${nx.id}" aria-label="Tick việc nhỏ ${esc(nx.text)}"><span class="ck s"></span></span><span class="t" style="margin-left:-6px">Kế tiếp: ${esc(nx.text)}</span>`}
+  ringEl=t===0?`<span class="rw" data-a="tickh:${h.id}" aria-label="Tick thói quen ${esc(h.name)}">${d?'<span class="ring full"><span></span></span>':'<span class="ring"><span></span></span>'}</span>`:`<span class="rw" data-a="open:${h.id}">${ring(d,t)}</span>`;
+  return `<div class="hab ${done?'done':''}" ${t===0?'':`data-a="open:${h.id}"`}>${ringEl}<div class="mid" ${t===0?`data-a="open:${h.id}"`:''}><b>${esc(h.name)}</b><small>${sub}</small></div><span class="pg">${pg}</span></div>`;
+}
+function vToday(){
+  const A=active(),dueNow=A.filter(h=>h.rep.t==='n'||sched(h,TODAY)),later=A.filter(h=>!(h.rep.t==='n'||sched(h,TODAY)));
+  const all=dueNow.length&&dueNow.every(h=>{const r=rec(h,TODAY);const t=h.subs.length;return pausedOn(h,TODAY)||(r&&(r.rest||(t?r.d>=t:r.done)))});
+  const anyDone=dueNow.some(h=>{const r=rec(h,TODAY);return r&&(h.subs.length?r.d>=h.subs.length:r.done)});
+  let b='';
+  if(D.pausedAll&&TODAY>=D.pausedAll.from&&TODAY<=D.pausedAll.to)b=`<div class="banner"><b>Đang tạm nghỉ đến ${dm(D.pausedAll.to)}</b><span class="sub" style="color:var(--text)">Bạn sẽ không bị nhắc. Chuỗi của bạn vẫn được giữ.</span><div class="btn t fit" data-a="resume" style="padding:0;margin:4px 0 -8px">Quay lại sớm</div></div>`;
+  else if(all&&anyDone)b=`<div class="banner"><b>Hôm nay bạn xong hết rồi!</b><span class="sub" style="color:var(--text)">Hẹn bạn ngày mai nhé.</span></div>`;
+  else if(S.welcome)b=`<div class="banner"><b>Chào mừng bạn quay lại!</b><span class="sub" style="color:var(--text)">Hôm nay chỉ cần bắt đầu từ một việc nhỏ thôi.</span><span class="icb x" data-a="closeWelcome" aria-label="Đóng">${ic('x',20)}</span></div>`;
+  let body;
+  if(!A.length)body=`<div class="illus" style="height:180px;margin-top:20px">Hình minh họa nhỏ: ô trống chờ bạn</div><p style="font:600 18px/26px var(--font);margin:20px 0 4px">Bắt đầu bằng một thói quen nhỏ</p><p class="sub">Chọn một việc bạn muốn giữ đều. Chia nhỏ thành vài việc, ngày mệt chỉ cần làm 1 việc.</p><div class="btn p" data-a="go:create" style="margin-top:14px">Thêm thói quen đầu tiên</div>`;
+  else body=dueNow.map(habCard).join('')+(later.length?`<div class="hab" data-a="later" style="opacity:.9;min-height:52px"><div class="mid"><b style="font-size:15px">Chưa đến lịch hôm nay (${later.length})</b></div><span class="pg" style="display:inline-block;${S.laterOpen?'transform:rotate(90deg)':''}">${ic('next',20)}</span></div>`+(S.laterOpen?later.map(h=>habCard(h).replace('class="hab','class="hab" style="background:var(--s2)" data-x="').replace(/<small>/,`<small>${h.rep.t==='days'?'Lịch: '+h.rep.days.map(i=>DS[i]).join(', ')+' · ':''}`)).join('')+'<p class="sub">Hôm nay không có lịch. Bạn vẫn làm được nếu muốn; ngày này không ảnh hưởng chuỗi.</p>':''):'')+'<div style="height:80px"></div>';
+  return `<div class="scr">${`<div class="top"><div><div class="t1">Hôm nay</div><div class="sub">${DN[dow(TODAY)]}, ${dm(TODAY)}</div></div><span class="icb" data-a="go:settings" aria-label="Cài đặt">${ic('gear')}</span></div>`}<div style="margin:6px 0 4px"><span class="chip" data-a="sheet:tired">Hôm nay mình mệt</span></div>${b}${body}</div>${A.length?`<div class="fab" data-a="go:create" aria-label="Thêm thói quen">${ic('plus')}</div>`:''}${tabs('h')}`;
+}
+
+/* ---------- chi tiết một thói quen ---------- */
+function weekDots(h){const m=mondayOf(TODAY);return [0,1,2,3,4,5,6].map(i=>dstat(h,addDays(m,i)))}
+function vDetail(){
+  const h=H(S.cur);if(!h)return vToday();
+  const r=rec(h,TODAY),t=h.subs.length;let list;
+  if(S.edit){
+    list=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><b>Việc nhỏ (${t}/5)</b><span class="sub">${t<5?`Còn thêm được ${5-t} việc`:'Đã đủ 5 việc'}</span></div>`+h.subs.map(s=>`<div class="row"><input class="field" style="flex:1;margin:4px 0;min-height:44px;padding:0 12px" value="${esc(s.text)}" data-in="sub:${s.id}" maxlength="40" aria-label="Việc nhỏ"><span class="icb o" data-a="delsub:${s.id}" aria-label="Xóa việc nhỏ">${ic('minus')}</span></div>`).join('')+(t<5?`<div class="btn s" data-a="addsub" style="margin-top:12px">＋ Thêm việc nhỏ (${t}/5)</div>`:`<div class="btn s dis" style="margin-top:12px">＋ Thêm việc nhỏ (5/5)</div><p class="sub">Tối đa 5 việc nhỏ. Cần thêm? Thử tách thành thói quen khác.</p>`)+`<p class="sub" style="margin-top:8px">Mỗi việc tối đa khoảng 40 ký tự. 2–3 việc nhỏ là vừa. Sửa chỉ áp dụng từ hôm nay trở đi.</p>`;
+  }else{
+    const d=r?r.d:0;
+    list=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><b>${t?`Việc nhỏ hôm nay (${d}/${t})`:'Thói quen này chưa có việc nhỏ'}</b><span class="lnk" data-a="edit:on">${ic('edit',16)}&nbsp;Sửa</span></div>`+(t?h.subs.map(s=>`<div class="row" data-a="ticks:${h.id}:${s.id}"><span style="display:flex;gap:12px;align-items:center"><span class="ck ${r&&r.ids.includes(s.id)?'on':''}"></span>${esc(s.text)}</span></div>`).join('')+`<p class="sub" style="margin-top:10px">Làm được 1 việc nhỏ là vẫn giữ chuỗi.</p>`:`<div class="row" data-a="tickh:${h.id}"><span style="display:flex;gap:12px;align-items:center"><span class="ck ${r&&r.done?'on':''}"></span>Đã làm hôm nay</span></div><p class="sub">Chia nhỏ thói quen này để dễ giữ chuỗi hơn: bấm Sửa để thêm việc nhỏ.</p>`);
+  }
+  const wd=weekDots(h),m=mondayOf(TODAY);
+  return `<div class="scr">${nav(esc(h.name),S.edit?`<span class="btn t fit" data-a="edit:off" style="min-height:44px;padding:0 8px;text-decoration:none;font-weight:700">Xong</span>`:`<span class="icb o" data-a="menu" aria-label="Thêm tùy chọn: sửa, tạm nghỉ, lưu trữ, xóa">${ic('more')}</span>`)}`
+   +(S.edit?'':`<div class="card"><div class="sub"><span style="color:var(--amber);font-weight:600">${ic('flame',16)} ${streakTxt(h)}</span>${streak(h).cur>0&&streak(h).best>streak(h).cur?` · tốt nhất ${streak(h).best} ${streak(h).unit}`:''}</div>${DOWROW}${dotsRow(wd,i=>`data-a="retro:${addDays(m,i)}"`)}${legend(`<span>${st('t',14)} hôm nay</span><span>${st('f',14)} chưa tới</span>`)}<p class="sub" style="font-size:12px;margin:2px 0 0">Chạm vào một ngày trong 3 ngày gần nhất để chỉnh.</p></div>`)+list+`</div>`
+   +(S.menu?`<div class="dim" data-a="menu"></div><div class="menu">${[['editfull','Sửa thói quen','Tên, lặp lại'],['sheet:pause','Tạm nghỉ…','Chọn số ngày'],['archive','Lưu trữ','Ẩn đi, giữ lịch sử'],['dlg:del','Xóa','Xóa hẳn, không khôi phục']].map(([a,t,s],i)=>`<div data-a="${a}"><div style="font:${i===3?700:500} 16px/22px var(--font)">${t}</div><div class="sub" style="font-size:13px;line-height:18px">${s}</div></div>`).join('')}</div>`:'');
+}
+
+/* ---------- tạo / sửa ---------- */
+function repTxt(f){return f.rep==='daily'?'Mỗi ngày':f.rep==='days'?'Các thứ: '+f.days.slice().sort().map(i=>DS[i]).join(', '):`${f.n} ngày/tuần`}
+function vCreate(){
+  const f=S.form,n=active().length,ed=!!S.editId;
+  return `<div class="scr">${nav(ed?'Sửa thói quen':'Thói quen mới',`<span class="btn t fit" data-a="saveh" style="min-height:44px;padding:0 8px;text-decoration:none;font-weight:700;${f.name&&f.name.trim()?'':'opacity:.45;pointer-events:none'}">Lưu</span>`)}
+  <input class="field" id="hname" placeholder="Tên thói quen" value="${esc(f.name)}" data-in="name" maxlength="60" aria-label="Tên thói quen">
+  ${!ed&&n>=7?`<div class="banner" style="padding-right:14px"><b>Theo nhiều thói quen cùng lúc dễ mệt hơn</b><span class="sub" style="color:var(--text)">Bạn đang theo ${n} thói quen. Muốn tạm nghỉ bớt một thói quen không?</span></div>`:''}
+  ${f.subs.map((x,i)=>`<div class="row"><input class="field" style="flex:1;margin:4px 0;min-height:44px;padding:0 12px" value="${esc(x)}" data-in="csub:${i}" maxlength="40" placeholder="Việc nhỏ ${i+1}"><span class="icb o" data-a="cdel:${i}" aria-label="Xóa việc nhỏ">${ic('minus')}</span></div>`).join('')}
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0"><span class="chip" data-a="cadd" style="${f.subs.length>=5?'opacity:.45;pointer-events:none':''}">${ic('plus',18)}&nbsp;Việc nhỏ (${f.subs.length}/5)</span><span class="chip" data-a="sheet:rep">Lặp lại: ${repTxt(f)}</span></div>
+  ${f.subs.length>=5?`<p class="sub">Tối đa 5 việc nhỏ. Cần thêm? Thử tách thành thói quen khác.</p>`:`<p class="sub" style="margin:6px 0">Chia thành vài việc nhỏ: chỉ cần làm được 1 việc nhỏ là hôm đó vẫn giữ chuỗi. 2–3 việc là vừa.</p>`}
+  ${ed?'<p class="sub">Sửa việc nhỏ hay lặp lại chỉ áp dụng từ hôm nay trở đi; các ngày đã qua giữ nguyên.</p>':'<p class="sub">Bản dùng thử chưa có nhắc giờ. Bạn có thể đặt báo thức của điện thoại cho thói quen này.</p>'}
+  <div class="btn p ${f.name&&f.name.trim()?'':'dis'}" data-a="saveh" style="margin-top:8px">Lưu</div></div>`;
+}
+
+/* ---------- quay lại ---------- */
+function comebackInfo(){
+  if(!active().length)return null;
+  let L=null;for(const d of Object.keys(D.recs)){if(d>=TODAY)continue;const r=D.recs[d];if(Object.keys(r).some(k=>{const x=r[k];return x&&(x.d>0||x.done)}))L=!L||d>L?d:L}
+  if(!L)return null;
+  if(D.flags.cbFor===L)return null;
+  let n=0;for(let d=addDays(L,1);d<TODAY;d=addDays(d,1)){if(active().some(h=>counts(h,d)&&dstat(h,d)!=='r'))n++}
+  return n>=2?{L,n}:null;
+}
+function lastWeekCount(){let n=0;for(let i=1;i<=7;i++){const d=addDays(TODAY,-i);if(active().some(h=>isG(dstat(h,d))&&counts(h,d)))n++}return n}
+function bestAll(){return Math.max(0,...D.habits.map(h=>streak(h).best))}
+function vComeback(){
+  const ds=[...Array(7)].map((_,i)=>{const d=addDays(TODAY,i-7);const g=active().some(h=>isG(dstat(h,d)));return g?(active().some(h=>dstat(h,d)==='d')?'d':'p'):'m'});
+  const wn=[...Array(7)].map((_,i)=>DS[dow(addDays(TODAY,i-7))]);
+  return `<div class="scr"><div class="top" style="justify-content:flex-end"><span class="icb" data-a="cb:go" aria-label="Đóng">${ic('x')}</span></div><div class="illus" style="height:150px">Hình minh họa ấm áp (nhân vật vẫy tay)</div><div style="font:700 28px/36px var(--font);margin:16px 0 4px;text-align:center">Chào mừng bạn quay lại!</div><p class="sub" style="text-align:center">Bạn đã vắng ${S.cbN||2} ngày. Không sao, mọi thứ vẫn ở đây.</p><div class="card"><div class="sub">7 ngày qua, bạn đã làm <b style="color:var(--text)">${ds.filter(c=>c!=='m').length} ngày</b></div><div class="wd" style="margin-top:6px">${wn.map(x=>`<span>${x}</span>`).join('')}</div>${dotsRow(ds)}${bestAll()?`<div class="sub" style="margin-top:6px">Chuỗi tốt nhất của bạn: <b style="color:var(--text)">${bestAll()} ngày</b></div>`:''}</div><p style="font:600 16px/24px var(--font);text-align:center;margin:12px 0 0">Hôm nay chỉ cần 1 việc nhỏ là bạn đã quay lại rồi.</p><p class="sub" style="text-align:center;margin:0 0 10px">Chuỗi của bạn vẫn được giữ.</p><div class="btn p" data-a="cb:go">Làm tiếp hôm nay</div><div class="btn t" data-a="sheet:cbpause">Tạm nghỉ vài ngày</div></div>`;
+}
+
+/* ---------- Tuần ---------- */
+function weekData(){
+  const m=addDays(mondayOf(TODAY),7*S.wk),dates=[...Array(7)].map((_,i)=>addDays(m,i));
+  const hs=active().concat(D.habits.filter(h=>h.st==='paused')).filter(h=>h.st==='active'&&h.created<=dates[6]);
+  const cols=dates.map(d=>{let x=0,y=0;hs.forEach(h=>{const c=dstat(h,d);if(d>TODAY)return;if(h.rep.t==='n'){if(isG(c)){x++;y++}return}if(!counts(h,d)||c==='r'||c==='t'||c==='n')return;y++;if(isG(c))x++});return {x,y,d}});
+  return {m,dates,hs,cols};
+}
+function vWeek(){
+  const W=weekData(),per_=per(`${dm(W.dates[0])} – ${dm(W.dates[6])}`,'wk:-1','wk:1',S.wk>=0);
+  const withData=W.cols.filter(c=>c.y>0);
+  if(!active().length)return `<div class="scr">${bar('Tuần')}${per_}<div class="illus" style="height:160px;margin-top:10px">Hình minh họa nhỏ: lịch còn trống</div><p style="font:600 18px/26px var(--font);margin:16px 0 4px">Tuần của bạn sẽ hiện ra ở đây</p><p class="sub">Thêm một thói quen và làm vài ngày, bạn sẽ thấy tuần của mình từng ngày.</p><div class="btn p" data-a="tab:h" style="margin-top:12px">Về Hôm nay</div></div>${tabs('w')}`;
+  let hero='';
+  if(withData.length>=2){
+    const ratio=c=>c.y?c.x/c.y:null;const rs=withData.map(c=>ratio(c));const mn=Math.min(...rs),mx=Math.max(...rs);const low=withData.find(c=>ratio(c)===mn);
+    hero=`<div class="card"><b style="font:600 15px/22px var(--font)">Mỗi ngày bạn giữ nhịp bao nhiêu thói quen?</b><div class="wd" style="margin-top:8px;color:var(--text)">${W.cols.map(c=>`<span ${mn<mx&&c===low?'style="font-weight:700"':''}>${c.y?`${c.x}/${c.y}`:'–'}</span>`).join('')}</div><div class="bars">${W.cols.map(c=>`<div ${mn<mx&&c===low?'class="low"':''} style="height:${c.y?Math.max(4,Math.round(c.x/c.y*100)):4}%"></div>`).join('')}</div><div class="wd" style="margin-top:4px">${DS.map(x=>`<span>${x}</span>`).join('')}</div>${mn<mx?`<div class="sub" style="margin-top:6px">${DN[dow(low.d)]} là ngày thấp nhất (${low.x}/${low.y} thói quen).</div>`:''}</div>`;
+  }else hero=`<div class="card"><b>${S.wk===0?'Tuần này mới bắt đầu':'Chưa có đủ dữ liệu cho tuần này'}</b><div class="sub">Làm vài ngày rồi quay lại đây, bạn sẽ thấy tuần của mình hiện ra từng ngày.</div></div>`;
+  const rows=W.hs.map(h=>{const cs=W.dates.map(d=>dstat(h,d));const r=xy(h,W.dates[0],W.dates[6]);return {h,cs,r}});
+  const best=rows.filter(o=>!o.r.w&&o.r.y>=3).sort((a,b)=>b.r.x/b.r.y-a.r.x/a.r.y)[0];
+  const old=D.habits.reduce((p,h)=>h.created<p?h.created:p,TODAY);
+  let sug='';
+  if(S.wk===0||true){
+    const cand=rows.filter(o=>!o.r.w&&o.r.y>=3&&o.r.y-o.r.x>=2).sort((a,b)=>(b.r.y-b.r.x)-(a.r.y-a.r.x))[0];
+    if(cand&&old<=addDays(TODAY,-14)&&!D.flags['sug'+W.m]&&cand.h.rep.t!=='n'){const N=Math.max(2,cand.r.x);sug=`<div class="banner" style="padding-right:14px"><b>Đề xuất</b><span class="sub" style="color:var(--text)">"${esc(cand.h.name)}" đang khó giữ: ${cand.r.y-cand.r.x}/${cand.r.y} ngày chưa làm. Chuyển sang ${N} ngày mỗi tuần nhé?</span><div style="display:flex;gap:10px;margin-top:6px"><span class="btn p fit" data-a="sug:ok:${cand.h.id}:${N}" style="min-height:44px">OK</span><span class="btn t fit" data-a="sug:later">Để sau</span></div></div>`}
+  }
+  return `<div class="scr">${bar('Tuần')}${per_}${hero}${DOWROW}${rows.map(({h,cs,r})=>`<div class="mh" data-a="open:${h.id}" style="padding:10px 12px"><div class="mhd"><b style="font-size:14px">${esc(h.name)}${h.rep.t==='n'?` <span class="sub" style="font-weight:400">· ${h.rep.n} ngày/tuần</span>`:''}</b><span class="sub" style="white-space:nowrap">${xyTxt(r)} ›</span></div>${dotsRow(cs)}</div>`).join('')}${legend()}${best?`<div class="card"><b>Nhận xét</b><div class="sub">${esc(best.h.name)} là thói quen bạn giữ đều nhất tuần này.</div></div>`:''}${sug}</div>${tabs('w')}`;
+}
+
+/* ---------- Tháng ---------- */
+function monthBase(){const d=parse(TODAY);d.setDate(1);d.setMonth(d.getMonth()+S.mo);return {y:d.getFullYear(),m:d.getMonth()}}
+function monthDates(){const {y,m}=monthBase();const n=daysIn(y,m);return [...Array(n)].map((_,i)=>`${y}-${pad(m+1)}-${pad(i+1)}`)}
+function vMonth(){
+  const {y,m}=monthBase(),ds=monthDates(),hs=D.habits.filter(h=>h.st==='active'&&h.created<=ds[ds.length-1]);
+  const paused=D.habits.filter(h=>h.st==='active'&&h.pause&&h.pause.to>=TODAY),arch=D.habits.filter(h=>h.st==='archived');
+  const monthCount=h=>{let c=0;ds.forEach(d=>{if(d<=TODAY&&isG(dstat(h,d)))c++});return c};
+  const per_=per(`Tháng ${pad(m+1)}/${y}`,'mo:-1','mo:1',S.mo>=0);
+  if(!active().length)return `<div class="scr">${bar('Tháng')}${per_}<div class="illus" style="height:160px;margin-top:10px">Hình minh họa nhỏ: lịch còn trống</div><p style="font:600 18px/26px var(--font);margin:16px 0 4px">Tháng của bạn sẽ hiện ra ở đây</p><p class="sub">Làm vài ngày, mỗi ngày một ô sẽ được tô lên và bạn thấy chuỗi dài ra.</p><div class="btn p" data-a="tab:h" style="margin-top:12px">Về Hôm nay</div><p class="sub" data-a="go:archived" style="text-decoration:underline;min-height:44px;display:flex;align-items:center">Đã lưu trữ (${arch.length}) ›</p></div>${tabs('m')}`;
+  const cur=S.mo===0,holding=hs.filter(h=>streak(h).cur>0).length,bestH=hs.map(h=>({h,s:streak(h).best})).sort((a,b)=>b.s-a.s)[0];
+  return `<div class="scr">${bar('Tháng')}${per_}<div class="card">${cur?`<b style="font:600 16px/22px var(--font)">Đang giữ chuỗi ${holding}/${hs.length} thói quen</b>`:`<b style="font:600 16px/22px var(--font)">Tháng đã qua</b>`}${bestH&&bestH.s>0?`<div class="sub">Chuỗi dài nhất: ${esc(bestH.h.name)}, ${bestH.s} ngày</div>`:''}</div><p class="sub" style="margin:4px 0">Chạm vào một thói quen để xem lịch chi tiết</p>${hs.map(h=>{const cs=ds.map(d=>dstat(h,d)==='t'?'t':dstat(h,d));const r=xy(h,ds[0],ds[ds.length-1]);return `<div class="mh" data-a="cal:${h.id}"><div class="mhd"><b>${esc(h.name)}</b><span class="lnk">Xem lịch ›</span></div>${stripHtml(cs.map(c=>c==='t'?'f':c))}<div class="foot">${h.created>ds[0]&&h.created<=ds[ds.length-1]?`Tạo ngày ${dm(h.created)} · `:''}${cur?streakTxt(h)+' · ':''}${h.rep.t==='n'?`giữ nhịp ${monthCount(h)} ngày (mục tiêu ${h.rep.n} ngày/tuần)`:`giữ nhịp ${r.x}/${r.y} ngày`}</div></div>`}).join('')}<div class="legend"><span><span class="cell done" style="flex:none;width:10px"></span> làm hết</span><span><span class="cell part" style="flex:none;width:10px"></span> một vài việc</span><span><span class="cell miss" style="flex:none;width:10px"></span> chưa làm</span><span><span class="cell rest" style="flex:none;width:10px"></span> nghỉ</span><span><span class="cell future" style="flex:none;width:10px"></span> chưa tới</span></div>${paused.length?`<p class="sub" style="margin:14px 0 2px">Đang tạm nghỉ (${paused.length})</p>`+paused.map(h=>`<div class="hab paused"><span class="icb o" style="width:40px;height:40px">${ic('moon')}</span><div class="mid"><b>${esc(h.name)}</b><small>Nghỉ tới ${dm(h.pause.to)}</small></div><span class="btn s fit" data-a="resumeh:${h.id}" style="min-height:44px;padding:0 14px;font-size:14px">Tiếp tục</span></div>`).join(''):''}<p class="sub" data-a="go:archived" style="text-decoration:underline;min-height:44px;display:flex;align-items:center">Đã lưu trữ (${arch.length}) ›</p><div class="btn s" data-a="go:create">＋ Thêm thói quen</div></div>${tabs('m')}`;
+}
+function vCal(){
+  const h=H(S.calH);if(!h)return vMonth();
+  const {y,m}=monthBase(),ds=monthDates();const first=dow(ds[0]);
+  let cells='';for(let i=0;i<first;i++)cells+='<div class="kc"></div>';
+  ds.forEach(d=>{const c=dstat(h,d);const run=h.rep.t!=='n'?(counts(h,d)&&(isG(c)||c==='r')):isG(c);const edit=d<TODAY&&d>=addDays(TODAY,-3);cells+=`<div class="kc${run?' run':''}" ${d<=TODAY?`data-a="retro:${d}"`:''}>${st(d===TODAY&&c==='t'?'t':c)}</div>`});
+  const sc=streak(h),cnt={d:0,p:0,r:0,m:0};ds.forEach(d=>{const c=dstat(h,d);if(c in cnt&&(counts(h,d)||isG(c)))cnt[c]++});
+  return `<div class="scr">${nav(esc(h.name),`<span class="sub" style="display:flex;align-items:center;min-height:44px;white-space:nowrap">Tháng ${pad(m+1)}/${y}</span>`)}<div style="display:flex;gap:10px;margin-top:4px"><div class="card" style="flex:1;margin:0"><div class="sub">Chuỗi hiện tại</div><b class="big">${sc.cur?sc.cur+' '+sc.unit:'–'}</b></div><div class="card" style="flex:1;margin:0"><div class="sub">Dài nhất</div><b class="big">${sc.best?sc.best+' '+sc.unit:'–'}</b></div></div>${DOWROW}<div class="cal">${cells}</div>${legend(`<span>${st('f',14)} chưa tới</span>`)}<p class="sub" style="margin:0">Nền be nối các ngày giữ chuỗi liền nhau. Chạm một ngày trong 3 ngày gần nhất để chỉnh.</p><div class="card"><span class="sub">Tháng này: ${cnt.d} ngày làm hết · ${cnt.p} ngày làm một vài việc · ${cnt.r} ngày nghỉ · ${cnt.m} ngày chưa làm</span></div></div>`;
+}
+
+/* ---------- cài đặt ---------- */
+function vSettings(){
+  const arch=D.habits.filter(h=>h.st==='archived').length;
+  return `<div class="scr">${nav('Cài đặt')}<div class="banner" style="padding-right:14px"><b>Bản dùng thử chưa có nhắc giờ</b><span class="sub" style="color:var(--text)">Hãy đặt báo thức của điện thoại cho những thói quen cần nhắc.</span></div><p class="sub" style="margin:8px 0 0">Giao diện</p><div class="row" data-a="sheet:theme"><span>Chế độ</span><span class="sub">${{sys:'Theo hệ thống',light:'Sáng',dark:'Tối'}[D.set.mode]} ›</span></div><p class="sub" style="margin:14px 0 0">Thói quen</p><div class="row" data-a="go:archived"><span>Đã lưu trữ (${arch})</span>${ic('next')}</div><div class="row" data-a="sheet:pauseall"><span>Tạm nghỉ toàn bộ</span>${ic('next')}</div><p class="sub" style="margin:14px 0 0">Dữ liệu (bản dùng thử)</p><div class="row" data-a="sheet:export"><span>Xuất dữ liệu để gửi cho người nghiên cứu<br><span class="sub">Tệp CSV, bạn tự gửi</span></span>${ic('next')}</div><div class="row" data-a="go:data"><span>Dữ liệu của bạn đang ở đâu?</span>${ic('next')}</div><div class="row" data-a="dlg:wipe"><span style="font-weight:700">Xóa toàn bộ dữ liệu</span>${ic('next')}</div><p class="sub" style="margin:14px 0 0">Về bản này</p><div class="row" data-a="go:about"><span>Hướng dẫn và thông tin</span>${ic('next')}</div></div>`;
+}
+function vData(){return `<div class="scr">${nav('Dữ liệu của bạn')}<div class="banner" style="padding-right:14px"><span>Tên và nội dung thói quen của bạn luôn ở trên điện thoại này.</span></div><p style="font:600 16px/24px var(--font);margin:14px 0 4px">Bản dùng thử này</p><p class="sub">Không gửi dữ liệu nào đi đâu. Không đăng nhập. Không có máy chủ. Chỉ khi bạn chọn "Xuất dữ liệu" và tự gửi tệp cho người nghiên cứu thì họ mới nhận được.</p><p style="font:600 16px/24px var(--font);margin:14px 0 4px">Lưu ý</p><p class="sub">Nếu bạn xóa dữ liệu của trình duyệt hoặc gỡ app, dữ liệu sẽ mất và không khôi phục được. Hãy xuất dữ liệu ${STORE_OK?'định kỳ':'ngay (trình duyệt đang chặn lưu)'} nếu muốn giữ lại.</p></div>`}
+function vAbout(){return `<div class="scr">${nav('Hướng dẫn và thông tin')}<p style="font:600 16px/24px var(--font);margin:8px 0 4px">Cách dùng mỗi ngày</p><p class="sub">1. Mở app, chạm ô tick cạnh "Kế tiếp" để làm xong một việc nhỏ.<br>2. Hôm nào mệt, chạm "Hôm nay mình mệt". Chỉ cần làm 1 việc nhỏ là vẫn giữ chuỗi.<br>3. Cuối tuần xem Tuần, cuối tháng xem Tháng.</p><p style="font:600 16px/24px var(--font);margin:14px 0 4px">Bản dùng thử có gì khác bản thật</p><p class="sub">Chưa có nhắc giờ, widget, thông báo. Chưa có đăng nhập hay sao lưu. Hình minh họa và biểu tượng là tạm.</p><p style="font:600 16px/24px var(--font);margin:14px 0 4px">Mã của bạn</p><input class="field" id="pid" placeholder="Ví dụ P01 (nếu người nghiên cứu đưa)" value="${esc(D.set.pid)}" data-in="pid" maxlength="12"><p class="sub">Mã này được ghi vào tệp xuất để người nghiên cứu biết tệp của ai. Không dùng tên thật.</p><p class="sub" style="margin-top:14px">${VERSION} · dữ liệu ${STORE_OK?'lưu được':'<b>không lưu được, trình duyệt đang chặn</b>'}</p><div class="btn s" data-a="demo" style="margin-top:10px">Nạp dữ liệu mẫu để xem thử</div><p class="sub">Cẩn thận: nạp dữ liệu mẫu sẽ thay toàn bộ dữ liệu hiện có.</p></div>`}
+function vArchived(){const a=D.habits.filter(h=>h.st==='archived');return `<div class="scr">${nav('Đã lưu trữ ('+a.length+')')}${a.length?a.map(h=>`<div class="hab"><div class="mid"><b>${esc(h.name)}</b><small>Lưu trữ ${dm(h.archivedAt||TODAY)} · ${streakTxt(h)}</small></div><span class="btn s fit" data-a="restore:${h.id}" style="min-height:44px;padding:0 14px;font-size:14px">Khôi phục</span></div>`).join(''):`<p class="sub" style="margin-top:20px">Chưa có thói quen nào được lưu trữ.</p>`}<p class="sub" style="margin-top:12px">Lưu trữ giữ lại lịch sử. Muốn xóa hẳn, mở thói quen rồi chọn Xóa.</p></div>`}
+function vOnb(){
+  if(S.onb===0)return `<div class="scr" style="display:flex;flex-direction:column"><div class="illus" style="height:300px;margin-top:20px">Hình minh họa: một chuỗi việc nhỏ nối thành thói quen</div><div style="flex:1"><div style="font:700 28px/36px var(--font);margin:24px 0 8px">Giữ thói quen bằng những việc nhỏ</div><p class="sub" style="font-size:16px;line-height:24px">Mỗi thói quen gồm vài việc nhỏ. Hôm nào mệt, chỉ cần làm 1 việc là bạn vẫn giữ được chuỗi.</p><p class="sub">Đây là bản dùng thử: dữ liệu chỉ ở trên điện thoại này.</p></div><div style="display:flex;gap:6px;justify-content:center;margin:8px 0">${st('d',10)}${st('f',10)}</div><div class="btn p" data-a="onb:1">Bắt đầu</div></div>`;
+  const sel=S.form.name||'',sg=['Đọc sách','Tập thể dục','Uống đủ nước','Học tiếng Anh','Ngủ sớm','Đi bộ'];
+  return `<div class="scr"><div class="top"><div class="t2">Bạn muốn giữ thói quen nào?</div></div><p class="sub">Chọn một gợi ý hoặc tự đặt tên. Thêm việc nhỏ sau cũng được.</p><div style="display:flex;flex-wrap:wrap;gap:10px;margin:14px 0">${sg.map(x=>`<span class="chip ${sel===x?'on':''}" data-a="pick:${x}">${x}</span>`).join('')}</div><input class="field" placeholder="Hoặc tự đặt tên" data-in="name" value="${sg.includes(sel)?'':esc(sel)}" maxlength="60" aria-label="Tên thói quen"><div style="margin-top:20px"><div class="btn p ${sel.trim()?'':'dis'}" data-a="onb:create">Tạo thói quen</div><div class="btn t" data-a="onb:skip">Bỏ qua, tôi sẽ tự tạo sau</div></div></div>`;
+}
+
+/* ---------- tờ và hộp thoại ---------- */
+function csvText(){
+  const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const L=[['Mã','Loại','Ngày','Thứ','Thói quen','Lặp lại','Số việc nhỏ','Số việc đã xong','Trạng thái','Ghi chú'].map(q).join(',')];
+  const pid=D.set.pid||'';
+  const lab={d:'làm hết',p:'một vài việc',m:'chưa làm',r:'nghỉ',t:'hôm nay chưa làm',n:'không áp dụng',f:'chưa tới'};
+  D.habits.forEach(h=>{const rp=h.rep.t==='daily'?'mỗi ngày':h.rep.t==='days'?'các thứ '+h.rep.days.map(i=>DS[i]).join(' '):h.rep.n+' ngày/tuần';
+    for(let d=h.created;d<=TODAY;d=addDays(d,1)){const c=dstat(h,d);const r=rec(h,d);L.push([pid,'ngày',d,DS[dow(d)],h.name,rp,r?r.t:h.subs.length,r?(r.t?r.d:(r.done?1:0)):0,lab[c],h.st==='archived'?'đã lưu trữ':(h.st==='paused'?'tạm nghỉ':'')].map(q).join(','))}});
+  D.opens.forEach(d=>L.push([pid,'mở app',d,DS[dow(d)],'','','','','',''].map(q).join(',')));
+  return '﻿'+L.join('\r\n');
+}
+function vSheet(){
+  const k=S.sheet;if(!k)return '';
+  const wrap=h=>`<div class="dim" data-a="sheet:close"></div><div class="sheet"><div class="grab"></div>${h}</div>`;
+  if(k==='tired'){const A=active().filter(h=>h.rep.t==='n'||sched(h,TODAY));return wrap(`<div class="t2">Hôm nay bạn mệt? Không sao</div><p class="sub">Chỉ cần làm 1 việc nhỏ là bạn vẫn giữ được chuỗi. Hôm nay bạn muốn làm thói quen nào?</p>${A.map(h=>{const r=S.tmp[h.id];return `<div class="row"><span style="font:500 16px var(--font)">${esc(h.name)}</span><span style="display:flex;gap:8px"><span class="chip w ${r?'':'on'}" data-a="tr:${h.id}:0">Làm</span><span class="chip w ${r?'on':''}" data-a="tr:${h.id}:1">Nghỉ</span></span></div>`}).join('')||'<p class="sub">Hôm nay không có thói quen nào có lịch.</p>'}<div class="btn p" data-a="tiredok" style="margin-top:14px">OK</div><div class="btn t" data-a="restall">Hôm nay nghỉ cả ngày</div>`)}
+  if(k==='rep'){const f=S.form;return wrap(`<div class="t2">Lặp lại</div><div class="row" data-a="rep:daily"><span>Mỗi ngày</span><span class="ck ${f.rep==='daily'?'on':''}"></span></div><div class="row" data-a="rep:days" style="flex-wrap:wrap;padding:10px 0"><span>Chọn các thứ trong tuần</span><span class="ck ${f.rep==='days'?'on':''}"></span></div><div style="display:flex;gap:2px;width:100%;margin:2px 0 6px">${DS.map((d,i)=>`<span class="chip w ${f.days.includes(i)?'on':''}" data-a="day:${i}" style="padding:0;flex:1;min-width:0">${d}</span>`).join('')}</div><div class="row"><span data-a="rep:n" style="flex:1">Số ngày mỗi tuần ${f.rep==='n'?'✓':''}</span><span style="display:flex;align-items:center;gap:8px"><span class="chip w" data-a="nn:-1">${ic('minus',18)}</span><b>${f.n} ngày</b><span class="chip w" data-a="nn:1">${ic('plus',18)}</span></span></div><p class="sub" style="margin:4px 0">Với "số ngày mỗi tuần", ngày nào cũng được.</p><div class="btn p" data-a="sheet:close" style="margin-top:8px">Xong</div>`)}
+  if(k==='pause'||k==='pauseall'||k==='cbpause'){const to=addDays(TODAY,S.pd-1);return wrap(`<div class="t2">Bạn muốn nghỉ mấy ngày?</div><div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap">${[3,7,14].map(n=>`<span class="chip ${S.pd===n?'on':''}" data-a="pd:${n}">${n} ngày</span>`).join('')}<span class="chip ${[3,7,14].includes(S.pd)?'':'on'}" data-a="pd:5">${[3,7,14].includes(S.pd)?'Tự chọn (5)':'Tự chọn: '+S.pd+' ngày'}</span></div><p class="sub">Trong thời gian nghỉ, bạn sẽ không bị nhắc, và chuỗi của bạn được giữ nguyên.</p><div class="btn p" data-a="pauseok:${k}" style="margin-top:10px">OK, nghỉ đến ${dm(to)}</div><div class="btn t" data-a="sheet:close">Quay lại</div>`)}
+  if(k==='retro'){const h=H(S.cur||S.calH),R=S.ret,items=h.subs.length?h.subs.map(s=>s.text):['Đã làm'];const n=R.checks.filter(Boolean).length;const res=n===0?'chưa làm':n>=items.length?'làm hết':'một vài việc';const nm=R.date===addDays(TODAY,-1)?DN[dow(R.date)]+' · hôm qua':R.date===addDays(TODAY,-2)?DN[dow(R.date)]+' · hôm kia':DN[dow(R.date)]+' · '+dm(R.date);return wrap(`<div class="t2">${nm}</div><p class="sub">${esc(h.name)} · bạn chỉnh được trong 3 ngày gần nhất.</p>${items.map((x,i)=>`<div class="row" data-a="rc:${i}"><span style="display:flex;gap:12px;align-items:center"><span class="ck ${R.checks[i]?'on':''}"></span>${esc(x)}</span></div>`).join('')}<div class="banner" style="padding-right:14px;margin:10px 0"><span>Kết quả: <b style="display:inline">${res}</b>.${n>0?' Vẫn giữ chuỗi.':''}</span></div><div class="btn p" data-a="retrook">OK</div><div class="btn t" data-a="sheet:close">Quay lại</div>`)}
+  if(k==='theme')return wrap(`<div class="t2">Chế độ giao diện</div>${[['sys','Theo hệ thống'],['light','Sáng'],['dark','Tối']].map(([v,n])=>`<div class="row" data-a="mode:${v}"><span>${n}</span><span class="ck ${D.set.mode===v?'on':''}"></span></div>`).join('')}<div class="btn p" data-a="sheet:close" style="margin-top:10px">Xong</div>`);
+  if(k==='export'){const n=D.habits.length;return wrap(`<div class="t2">Xuất dữ liệu</div><p class="sub">Tệp CSV gồm từng ngày của từng thói quen và các ngày bạn mở app. <b>Không</b> được gửi tự động; bạn tự gửi cho người nghiên cứu nếu đồng ý. Tệp có tên thói quen bạn đặt.</p><div class="btn p" data-a="exp:share" style="margin-top:8px">Chia sẻ tệp</div><div class="btn s" data-a="exp:dl" style="margin-top:8px">Tải xuống</div><div class="btn s" data-a="exp:copy" style="margin-top:8px">Sao chép nội dung</div><textarea class="field" id="csvbox" readonly>${esc(csvText())}</textarea><p class="sub">${n} thói quen. Nếu "Chia sẻ" không hiện, hãy dùng "Sao chép" rồi dán vào tin nhắn hoặc email.</p>`)}
+  return '';
+}
+function vDlg(){
+  if(!S.dlg)return '';const h=H(S.cur);
+  const T={del:[`Xóa "${h?esc(h.name):''}"?`,'Xóa hẳn cả lịch sử, không khôi phục được. Nếu chỉ muốn ẩn đi, hãy chọn Lưu trữ.','Xóa','delok'],wipe:['Xóa toàn bộ dữ liệu?','Mọi thói quen và lịch sử trên máy này sẽ bị xóa hẳn, không khôi phục được.','Xóa hết','wipeok'],demo:['Nạp dữ liệu mẫu?','Việc này thay toàn bộ dữ liệu hiện có bằng dữ liệu mẫu. Không khôi phục được.','Nạp dữ liệu mẫu','demook'],discard:['Bỏ thay đổi?','Bạn có thay đổi chưa lưu.','Bỏ thay đổi','discardok']}[S.dlg];
+  return `<div class="dim" data-a="dlg:close" style="z-index:60"></div><div class="dlg"><div class="t2">${T[0]}</div><p class="sub">${T[1]}</p><div class="btn s" data-a="${T[3]}" style="margin-top:8px;font-weight:700">${T[2]}</div><div class="btn t" data-a="dlg:close">Quay lại</div></div>`;
+}
+
+/* ---------- dựng giao diện ---------- */
+function applyTheme(){const m=D.set.mode;const dark=m==='dark'||(m==='sys'&&matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.body.setAttribute('data-theme',dark?'dark':'light');document.documentElement.setAttribute('data-theme',dark?'dark':'light');const tc=document.querySelector('meta[name=theme-color]');if(tc)tc.content=dark?'#1E1A16':'#3F5FC4'}
+function render(){
+  applyTheme();
+  const V={today:vToday,detail:vDetail,create:vCreate,comeback:vComeback,week:vWeek,month:vMonth,cal:vCal,settings:vSettings,data:vData,about:vAbout,archived:vArchived,onb:vOnb}[S.screen]||vToday;
+  const keep=$('.scr')?$('.scr').scrollTop:0,focus=document.activeElement&&document.activeElement.id==='hname'?{s:document.activeElement.selectionStart}:null;
+  $('#app').innerHTML=V()+vSheet()+vDlg()+(S.snack?`<div class="snack"><span>${esc(S.snack.text)}</span>${S.snack.undo?`<b data-a="undo" role="button">Hoàn tác</b>`:''}</div>`:'');
+  if($('.scr')&&S.keepScroll!==false)$('.scr').scrollTop=keep;
+}
+function go(sc){S.stack.push(S.screen);S.screen=sc;S.menu=false;S.sheet=null;window.scrollTo(0,0)}
+function resetForm(){S.form={name:'',subs:[],rep:'daily',days:[0,2,4],n:3};S.dirty=false}
+function finish(){save();render()}
+
+/* ---------- hành động ---------- */
+function act(a){
+  const p=a.split(':'),k=p[0],x=p[1],y=p[2],z=p[3];
+  S.keepScroll=true;
+  if(k==='tab'){S.stack=[];S.screen={h:'today',w:'week',m:'month'}[x];S.sheet=null;S.menu=false;S.keepScroll=false;}
+  else if(k==='go'){if(x==='create'){resetForm();S.editId=null}go(x);S.keepScroll=false;}
+  else if(k==='back'){if(S.screen==='create'&&S.dirty){S.dlg='discard'}else{S.screen=S.stack.pop()||'today';S.edit=false;S.menu=false;S.editId=null;S.keepScroll=false}}
+  else if(k==='open'){S.cur=+x;S.edit=false;go('detail');S.keepScroll=false;}
+  else if(k==='ticks'){tickSub(+x,+y);S.welcome=false;}
+  else if(k==='tickh'){tickHab(+x);S.welcome=false;}
+  else if(k==='sheet'){if(x==='tired')S.tmp={};if(x==='pause'||x==='pauseall'||x==='cbpause')S.pd=3;S.sheet=x==='close'?null:x;S.menu=false;}
+  else if(k==='tr'){S.tmp[x]=+y;}
+  else if(k==='tiredok'){withUndo(()=>{Object.keys(S.tmp).forEach(id=>{if(S.tmp[id]){const h=H(id);const r=rec(h,TODAY,true);r.rest=1}})},'Đã cập nhật hôm nay');S.sheet=null;}
+  else if(k==='restall'){withUndo(()=>{active().forEach(h=>{if(h.rep.t==='n'||sched(h,TODAY)){const r=rec(h,TODAY,true);r.rest=1}})},'Hôm nay nghỉ cả ngày');S.sheet=null;}
+  else if(k==='undo'){if(S.undo){D=JSON.parse(S.undo);S.undo=null;S.snack=null}}
+  else if(k==='closeWelcome'){S.welcome=false;}
+  else if(k==='resume'){withUndo(()=>{D.pausedAll=null},'Đã quay lại');}
+  else if(k==='cb'){D.flags.cbFor=S.cbL;S.screen='today';S.stack=[];S.welcome=true;S.keepScroll=false;}
+  else if(k==='pd'){if(+x===5){S.pd=[3,7,14].includes(S.pd)?5:(S.pd>=30?5:S.pd+1)}else S.pd=+x;}
+  else if(k==='resumeh'){const h=H(x);withUndo(()=>{delete h.pause},'Đã quay lại '+h.name);}
+  else if(k==='pauseok'){const to=addDays(TODAY,S.pd-1);S.sheet=null;if(x==='pause'){withUndo(()=>{H(S.cur).pause={from:TODAY,to}},'Đã tạm nghỉ '+H(S.cur).name);S.screen='today';S.stack=[]}else{withUndo(()=>{D.pausedAll={from:TODAY,to}},'Đã tạm nghỉ đến '+dm(to));if(x==='cbpause'){D.flags.cbFor=S.cbL}S.screen='today';S.stack=[]}S.keepScroll=false;}
+  else if(k==='menu'){S.menu=!S.menu;}
+  else if(k==='edit'){S.edit=x==='on';}
+  else if(k==='editfull'){const h=H(S.cur);S.menu=false;S.editId=h.id;S.form={name:h.name,subs:h.subs.map(s=>s.text),rep:h.rep.t,days:h.rep.days||[0,2,4],n:h.rep.n||3};S.dirty=false;go('create');S.keepScroll=false;}
+  else if(k==='archive'){const h=H(S.cur);S.menu=false;withUndo(()=>{h.st='archived';h.archivedAt=TODAY},'Đã lưu trữ '+h.name);S.screen='today';S.stack=[];S.keepScroll=false;}
+  else if(k==='restore'){const h=H(x);withUndo(()=>{h.st='active'},'Đã khôi phục '+h.name);}
+  else if(k==='dlg'){S.dlg=x==='close'?null:x;S.menu=false;}
+  else if(k==='delok'){const h=H(S.cur);S.dlg=null;withUndo(()=>{D.habits=D.habits.filter(z=>z.id!==h.id);Object.keys(D.recs).forEach(d=>{delete D.recs[d][h.id]})},'Đã xóa '+h.name);S.screen='today';S.stack=[];S.keepScroll=false;}
+  else if(k==='wipeok'){S.dlg=null;const pid=D.set.pid;D=blank();D.set.pid=pid;S.screen='onb';S.onb=0;S.stack=[];S.keepScroll=false;}
+  else if(k==='discardok'){S.dlg=null;S.dirty=false;S.screen=S.stack.pop()||'today';S.editId=null;S.keepScroll=false;}
+  else if(k==='delsub'){const h=H(S.cur);withUndo(()=>{h.subs=h.subs.filter(s=>s.id!==+x);const r=rec(h,TODAY);if(r)sync(h,TODAY,r)},'Đã xóa một việc nhỏ');}
+  else if(k==='addsub'){const h=H(S.cur);if(h.subs.length<5){h.subs.push({id:D.next++,text:'Việc nhỏ mới'});const r=rec(h,TODAY);if(r)sync(h,TODAY,r)}}
+  else if(k==='cadd'){if(S.form.subs.length<5){S.form.subs.push('');S.dirty=true}}
+  else if(k==='cdel'){S.form.subs.splice(+x,1);S.dirty=true;}
+  else if(k==='rep'){S.form.rep=x;S.dirty=true;}
+  else if(k==='day'){const d=S.form.days,i=d.indexOf(+x);if(i>=0)d.splice(i,1);else d.push(+x);S.form.rep='days';S.dirty=true;}
+  else if(k==='nn'){S.form.n=Math.min(7,Math.max(1,S.form.n+(+x)));S.form.rep='n';S.dirty=true;}
+  else if(k==='saveh'){const f=S.form;if(!f.name||!f.name.trim())return;
+    const rep=f.rep==='daily'?{t:'daily'}:f.rep==='days'?{t:'days',days:f.days.length?f.days.slice().sort():[0]}:{t:'n',n:f.n};
+    if(S.editId){const h=H(S.editId);h.name=f.name.trim();h.rep=rep;
+      const old=h.subs;h.subs=f.subs.filter(s=>s.trim()).map((s,i)=>({id:(old[i]&&old[i].id)||D.next++,text:s.trim()}));const r=rec(h,TODAY);if(r)sync(h,TODAY,r);
+      S.editId=null;S.dirty=false;S.screen=S.stack.pop()||'today';snack('Đã lưu thay đổi');}
+    else{D.habits.push({id:D.next++,name:f.name.trim(),st:'active',created:TODAY,rep,subs:f.subs.filter(s=>s.trim()).map(s=>({id:D.next++,text:s.trim()})),order:D.habits.length});S.screen='today';S.stack=[];S.tab='h';S.dirty=false;}
+    S.keepScroll=false;}
+  else if(k==='later'){S.laterOpen=!S.laterOpen;}
+  else if(k==='retro'){const date=x,hid=S.screen==='detail'?S.cur:S.calH;const h=H(hid);
+    if(date>TODAY||date===TODAY){}
+    else if(date<addDays(TODAY,-3)){snack('Chỉ chỉnh được 3 ngày gần nhất')}
+    else{const r=rec(h,date);const items=h.subs.length||1;const checks=h.subs.length?h.subs.map(s=>!!(r&&r.ids.includes(s.id))):[!!(r&&r.done)];S.cur=hid;S.ret={date,checks};S.sheet='retro'}}
+  else if(k==='rc'){S.ret.checks[+x]=!S.ret.checks[+x];}
+  else if(k==='retrook'){const h=H(S.cur),R=S.ret;withUndo(()=>{const r=rec(h,R.date,true);if(h.subs.length){r.ids=h.subs.filter((s,i)=>R.checks[i]).map(s=>s.id);r.t=h.subs.length;r.d=r.ids.length;r.done=0}else{r.t=0;r.done=R.checks[0]?1:0;r.ids=[];r.d=0}if(r.d>0||r.done)r.rest=0},'Đã cập nhật ngày này');S.sheet=null;S.ret=null;}
+  else if(k==='mode'){D.set.mode=x;}
+  else if(k==='wk'){S.wk=Math.min(0,S.wk+(+x));}
+  else if(k==='mo'){S.mo=Math.min(0,S.mo+(+x));}
+  else if(k==='cal'){S.calH=+x;go('cal');S.keepScroll=false;}
+  else if(k==='sug'){if(x==='ok'){const h=H(y);withUndo(()=>{h.rep={t:'n',n:+z}},'Đã chuyển '+h.name+' sang '+z+' ngày mỗi tuần')}else{D.flags['sug'+mondayOf(TODAY)]=1;snack('Để sau nhé')}}
+  else if(k==='onb'){if(x==='1')S.onb=1;else if(x==='create'){const n=(S.form.name||'').trim();if(!n)return;D.habits.push({id:D.next++,name:n,st:'active',created:TODAY,rep:{t:'daily'},subs:[],order:0});S.screen='today';S.stack=[];S.keepScroll=false}else{S.screen='today';S.stack=[]}}
+  else if(k==='pick'){S.form.name=x;}
+  else if(k==='exp'){const t=csvText(),fn=`habitflow-${D.set.pid||'du-lieu'}-${TODAY}.csv`;
+    if(x==='copy'){const box=$('#csvbox');try{navigator.clipboard.writeText(t.replace(/^﻿/,'')).then(()=>{snack('Đã sao chép');render()},()=>{box.select();document.execCommand('copy');snack('Đã sao chép');render()})}catch(e){box.select();document.execCommand('copy');snack('Đã sao chép')}}
+    else if(x==='dl'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download=fn;document.body.appendChild(a);a.click();a.remove();snack('Đã tạo tệp. Nếu không thấy, dùng Sao chép.')}
+    else if(x==='share'){const f=new File([t],fn,{type:'text/csv'});if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:'Dữ liệu HabitFlow'}).catch(()=>{});else snack('Máy này không chia sẻ được tệp. Dùng Sao chép.')}}
+  else if(k==='demo'){S.dlg='demo';}
+  else if(k==='demook'){S.dlg=null;seedDemo();S.screen='today';S.stack=[];S.keepScroll=false;snack('Đã nạp dữ liệu mẫu');}
+  finish();
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(el&&$('#app').contains(el)){act(el.dataset.a)}else if(e.target.closest('#app')&&S.menu&&!e.target.closest('.menu')){}});
+document.addEventListener('input',e=>{const el=e.target;if(!el.dataset||!el.dataset.in)return;const [k,i]=el.dataset.in.split(':');
+  if(k==='name'){S.form.name=el.value;S.dirty=true;document.querySelectorAll('[data-a="saveh"],[data-a="onb:create"]').forEach(b=>{const on=el.value.trim();b.classList.toggle('dis',!on);if(b.classList.contains('t')){b.style.opacity=on?'':'.45';b.style.pointerEvents=on?'':'none'}})}
+  else if(k==='csub'){S.form.subs[+i]=el.value;S.dirty=true}
+  else if(k==='sub'){const h=H(S.cur);const s=h.subs.find(z=>z.id===+i);if(s){s.text=el.value;save()}}
+  else if(k==='pid'){D.set.pid=el.value.trim();save()}
+});
+
+/* ---------- dữ liệu mẫu (để xem thử) ---------- */
+function seedDemo(){
+  const keep=D.set.pid;D=blank();D.set.pid=keep;D.created=addDays(TODAY,-40);
+  let seed=7;const rnd=()=>{seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296};
+  const mk=(name,subs,rep,p)=>{const h={id:D.next++,name,st:'active',created:addDays(TODAY,-40),rep,subs:subs.map(t=>({id:D.next++,text:t})),order:D.habits.length};D.habits.push(h);
+    for(let d=h.created;d<TODAY;d=addDays(d,1)){if(!(rep.t==='daily'||(rep.t==='days'&&rep.days.includes(dow(d)))||rep.t==='n'))continue;if(rep.t==='n'&&rnd()>.45)continue;
+      const u=rnd();if(u>p+.1)continue;const r=rec(h,d,true);r.t=h.subs.length;if(h.subs.length){const full=u<p-.05;r.ids=full?h.subs.map(s=>s.id):[h.subs[0].id];r.d=r.ids.length}else{r.done=1;r.t=0}}};
+  mk('Đọc sách',['Đọc 10 trang','Ghi 1 dòng cảm nhận'],{t:'daily'},.9);
+  mk('Tập thể dục',['Khởi động 5 phút','Chống đẩy 20 cái','Plank 1 phút'],{t:'days',days:[0,2,4]},.8);
+  mk('Học tiếng Anh',['Nghe 15 phút','Làm 1 bài đọc'],{t:'n',n:3},.9);
+  mk('Uống đủ nước',[],{t:'daily'},.85);
+  mk('Ngủ trước 23h',['Tắt màn hình lúc 22h30','Đọc nhẹ 10 phút'],{t:'daily'},.5);
+  for(let i=1;i<=12;i++)D.opens.push(addDays(TODAY,-i));
+}
+
+/* ---------- khởi động ---------- */
+function boot(){
+  D=load();const demo=Q.get('demo')==='1';
+  if(!D){D=blank();S.screen='onb';if(demo){seedDemo();S.screen='today'}}
+  else if(demo&&Q.get('force')==='1'){seedDemo()}
+  D.habits.forEach(h=>{if(!h.subs)h.subs=[]});
+  if(!D.opens.includes(TODAY))D.opens.push(TODAY);
+  // tự kết thúc tạm nghỉ đã hết hạn
+  D.habits.forEach(h=>{if(h.pause&&h.pause.to<TODAY)delete h.pause});if(D.pausedAll&&D.pausedAll.to<TODAY)D.pausedAll=null;
+  const cb=comebackInfo();if(cb&&S.screen!=='onb'){S.screen='comeback';S.cbN=cb.n;S.cbL=cb.L}
+  save();render();
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){const t=Q.get('today')||fmt(new Date());if(t!==TODAY){TODAY=t;D.opens.includes(TODAY)||D.opens.push(TODAY);const cb=comebackInfo();if(cb){S.screen='comeback';S.cbN=cb.n;S.cbL=cb.L}save()}render()}});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "HabitFlow (bản dùng thử)",
+  "short_name": "HabitFlow",
+  "description": "Giữ thói quen bằng những việc nhỏ. Bản dùng thử, dữ liệu lưu trên máy.",
+  "lang": "vi",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7F1",
+  "theme_color": "#3F5FC4",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
