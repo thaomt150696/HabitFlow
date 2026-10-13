@@ -1,5 +1,5 @@
 // Service worker: lưu giao diện app để dùng khi không có mạng. Đổi VERSION mỗi khi cập nhật file.
-const VERSION = 'hf-test-1';
+const VERSION = 'hf-test-4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
